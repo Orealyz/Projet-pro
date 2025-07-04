@@ -1,0 +1,22 @@
+---
+  - name: Créer l'utilisateur {{ user.name }}
+    user:
+      name: "{{ user.name }}"
+      shell: /bin/bash
+      groups: wheel
+      append: yes
+      state: present
+
+  - name: Ajouter la clé SSH pour {{ user.name }}
+    authorized_key:
+      user: "{{ user.name }}"
+      key: "{{ user.ssh_key }}"
+      state: present
+
+  - name: Configurer sudo sans mot de passe pour {{ user.name }}
+    copy:
+      dest: "/etc/sudoers.d/{{ user.name }}"
+      content: "{{ user.name }} ALL=(ALL) NOPASSWD:ALL\n"
+      mode: '0440'
+      owner: root
+      group: root

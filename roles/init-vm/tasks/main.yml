@@ -1,0 +1,13 @@
+---
+  - name: Inclure le rôle users
+    import_role:
+      name: users
+
+  - name: Inclure le rôle packages
+    import_role:
+      name: packages
+
+  - name: Inclure le rôle docker uniquement si nécessaire
+    import_role:
+      name: docker
+    when: install_docker | default(false)

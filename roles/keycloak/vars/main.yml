@@ -1,0 +1,15 @@
+keycloak_image: "quay.io/keycloak/keycloak:24.0.3"
+keycloak_admin_user: "admin"
+keycloak_admin_password: "admin"
+keycloak_dir: /root/keycloak
+realm: master
+grafana_root_url: "https://grafana-maralex.duckdns.org"
+client_id: grafana-oauth
+client_secret: id2WAqrp1gRStdl0wV88YO87DfalODU5
+mapper_name: client roles
+
+gitlab_url: "https://gitlab-maralex.duckdns.org"
+gitlab_client_id: "gitlab"
+gitlab_client_secret: "id2WAqrp1gRStdl0wV88YO87DfalODU5"
+keycloak_url: "https://keycloak-maralex.duckdns.org"
+keycloak_container: "keycloak"

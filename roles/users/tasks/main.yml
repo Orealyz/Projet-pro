@@ -1,0 +1,6 @@
+---
+  - name: Gérer les utilisateurs (via include)
+    include_tasks: user.yml
+    loop: "{{ users }}"
+    loop_control:
+      loop_var: user

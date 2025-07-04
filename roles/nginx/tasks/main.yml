@@ -1,0 +1,62 @@
+---
+  - name: Installer Nginx
+    package:
+      name: nginx
+      state: present
+
+  - name: Copier la configuration Nginx
+    template:
+      src: nginx.conf.j2
+      dest: /etc/nginx/nginx.conf
+      mode: 0644
+  - name: Arrêter Nginx temporairement pour libérer le port 80
+    service:
+      name: nginx
+      state: stopped
+    ignore_errors: true
+    
+  - name: Autoriser nginx à faire des connexions réseau avec SELinux
+    ansible.posix.seboolean:
+      name: httpd_can_network_connect
+      state: true
+      persistent: yes
+
+  - name: Installer Certbot
+    dnf:
+      name: certbot
+      state: present
+  
+  - name: Obtenir le certificat Let's Encrypt (standalone) pour chaque domaine
+    command: >
+      certbot certonly --standalone
+      --non-interactive
+      --agree-tos
+      --email {{ email }}
+      -d {{ item }}
+    args:
+      creates: "/etc/letsencrypt/live/{{ item }}/fullchain.pem"
+    loop: "{{ domains }}"
+
+  - name: Démarrer et activer Nginx
+    service:
+      name: nginx
+      state: started
+      enabled: yes
+
+  - name: Reload nginx
+    systemd:
+      name: nginx
+      state: reloaded
+
+  - name: Vérifier que le certificat a bien été généré
+    stat:
+      path: "/etc/letsencrypt/live/{{ item }}/fullchain.pem"
+    loop: "{{ domains }}"
+    register: cert_file
+
+  - name: Afficher le résultat
+    debug:
+      msg: "✅ Certificat généré avec succès pour {{ item.item }}"
+    loop: "{{ cert_file.results }}"
+    when: item.stat.exists
+    

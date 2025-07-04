@@ -1,0 +1,27 @@
+---
+  - name: Installer les dépendances nécessaires à Docker
+    dnf:
+      name:
+        - yum-utils
+        - device-mapper-persistent-data
+        - lvm2
+      state: present
+
+  - name: Ajouter le dépôt officiel Docker
+    get_url:
+      url: https://download.docker.com/linux/centos/docker-ce.repo
+      dest: /etc/yum.repos.d/docker-ce.repo
+
+  - name: Installer Docker
+    dnf:
+      name:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+      state: present
+
+  - name: Démarrer et activer Docker
+    systemd:
+      name: docker
+      state: started
+      enabled: yes

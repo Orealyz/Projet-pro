@@ -1,0 +1,126 @@
+events {
+    worker_connections 1024;
+}
+
+http {
+    # Upstreams
+    upstream gitlab_servers {
+        least_conn;
+        server 54.36.101.87:80;
+        server 152.228.172.167:80;
+    }
+
+    upstream keycloak_servers {
+        server 51.38.232.14:8080;
+    }
+
+    upstream grafana_servers {
+        server 51.38.234.58:3000;
+    }
+
+    # Serveur GitLab 
+    server {
+        listen 80;
+        server_name gitlab-maralex.duckdns.org;
+        return 301 https://$host$request_uri;
+    }
+    # Serveur Keycloak
+    server {
+        listen 80;
+        server_name keycloak-maralex.duckdns.org;
+        return 301 https://$host$request_uri;
+    }
+    # Serveur Grafana
+    server {
+        listen 80;
+        server_name grafana-maralex.duckdns.org;
+        return 301 https://$host$request_uri;
+    }
+
+
+    # Serveur Keycloak 
+    server {
+        listen 443 ssl;
+        server_name keycloak-maralex.duckdns.org;
+
+        ssl_certificate /etc/letsencrypt/live/keycloak-maralex.duckdns.org/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/keycloak-maralex.duckdns.org/privkey.pem;
+
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_prefer_server_ciphers on;
+
+        location / {
+            proxy_pass http://keycloak_servers;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto https;
+
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
+            proxy_buffering off;
+            proxy_connect_timeout 60s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+            send_timeout 60s;
+        }
+    }
+
+    # Serveur Grafana 
+    server {
+        listen 443 ssl;
+        server_name grafana-maralex.duckdns.org;
+
+        ssl_certificate /etc/letsencrypt/live/grafana-maralex.duckdns.org/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/grafana-maralex.duckdns.org/privkey.pem;
+
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_prefer_server_ciphers on;
+
+        location / {
+            proxy_pass http://grafana_servers/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Port $server_port;
+
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
+            proxy_buffering off;
+            proxy_connect_timeout 60s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+            send_timeout 60s;
+        }
+    }
+    # Serveur GitLab 
+    server {
+        listen 443 ssl;
+        server_name gitlab-maralex.duckdns.org;
+
+        ssl_certificate /etc/letsencrypt/live/gitlab-maralex.duckdns.org/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/gitlab-maralex.duckdns.org/privkey.pem;
+
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_prefer_server_ciphers on;
+
+        location / {
+            proxy_pass http://gitlab_servers;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto https;
+
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
+            proxy_buffering off;
+            proxy_connect_timeout 60s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+            send_timeout 60s;
+        }
+    }
+
+}

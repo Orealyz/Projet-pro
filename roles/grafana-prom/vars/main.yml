@@ -1,0 +1,5 @@
+grafana_prom_dir: /root/grafana-prom
+grafana_oidc_client_id: "grafana"
+grafana_oidc_secret: "{{ lookup('env','passwordkeycloak') }}"  
+keycloak_url: "https://keycloak-maralex.duckdns.org"
+grafana_redirect_uri: "https://grafana-maralex.duckdns.org/login/generic_oauth"

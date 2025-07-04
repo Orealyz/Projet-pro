@@ -1,0 +1,39 @@
+---
+  - name: Stopper le conteneur si il tourne
+    command: docker compose down
+    args:
+      chdir: "{{ grafana_prom_dir }}"
+    ignore_errors: true
+    
+  - name: Créer le répertoire grafana-prom
+    file:
+      path: "{{ grafana_prom_dir }}"
+      state: directory
+      mode: '0755'
+
+  - name: Copier le fichier docker-compose.yml en template
+    template:
+      src: docker-compose.yml.j2
+      dest: "{{ grafana_prom_dir }}/docker-compose.yml"
+      mode: '0644'
+  - name: Déployer la config grafana.ini
+    template:
+      src: grafana.ini.j2
+      dest: "{{ grafana_prom_dir }}/grafana.ini"
+      mode: '0644'
+  - name: Copier le fichier prometheus.yml en template
+    template:
+      src: prometheus.yml.j2
+      dest: "{{ grafana_prom_dir }}/prometheus.yml"
+      mode: '0644'
+      
+  - name: Copier les fichiers de provisioning Grafana
+    copy:
+      src: grafana/
+      dest: "{{ grafana_prom_dir }}/grafana"
+      mode: '0755'
+      
+  - name: Lancer docker compose manuellement
+    command: docker compose up -d
+    args:
+      chdir: "{{ grafana_prom_dir }}"
