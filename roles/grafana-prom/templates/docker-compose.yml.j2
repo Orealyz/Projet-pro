@@ -10,6 +10,8 @@ services:
     ports:
       - "9090:9090"
     restart: unless-stopped
+    mem_limit: 500m
+    cpus: 0.5
 
   postgres:
     image: postgres:15
@@ -21,6 +23,8 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: unless-stopped
+    mem_limit: 512m
+    cpus: 0.5
 
   grafana:
     image: grafana/grafana:latest
@@ -36,7 +40,6 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_AUTH_GENERIC_OAUTH_ENABLED=true
-
     volumes:
       - "{{ grafana_prom_dir }}/grafana.ini:/etc/grafana/grafana.ini"
       - grafana-storage:/var/lib/grafana
@@ -46,6 +49,8 @@ services:
     depends_on:
       - postgres
     restart: unless-stopped
+    mem_limit: 300m
+    cpus: 0.4
 
 volumes:
   pgdata:

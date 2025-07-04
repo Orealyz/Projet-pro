@@ -37,20 +37,20 @@
 #   roles:
 #     - grafana-prom
 
-- name: Initialisation d'une VM
-  hosts: keycloak_nginx
-  become: true
-  vars_files:
-    - roles/init-vm/vars/main.yml
-  roles:
-    - init-vm
-
-
-# - name: Installation de Grafana
-#   hosts: grafana
+# - name: Initialisation d'une VM
+#   hosts: keycloak_nginx
 #   become: true
+#   vars_files:
+#     - roles/init-vm/vars/main.yml
 #   roles:
-#     - grafana-prom
+#     - init-vm
+
+
+- name: Installation de Grafana
+  hosts: grafana
+  become: true
+  roles:
+    - grafana-prom
 
 # - name: Installation de Node Exporter
 #   hosts: all
@@ -77,11 +77,11 @@
 #   roles:
 #     - gitlab
 
-- name: Installation de Keycloak et Nginx
-  hosts: keycloak_nginx
-  become: true
-  roles:
-    - keycloak
-    - nginx
+# - name: Installation de Keycloak et Nginx
+#   hosts: keycloak_nginx
+#   become: true
+#   roles:
+#     - keycloak
+#     - nginx
 
 
