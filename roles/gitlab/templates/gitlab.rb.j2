@@ -1,0 +1,47 @@
+external_url "http://54.36.101.87/"
+
+redis['enable'] = false
+
+gitlab_rails['redis_host'] = '51.38.239.212'
+gitlab_rails['redis_port'] = 6379
+gitlab_rails['redis_password'] = 'MAroot'
+
+gitlab_rails['redis_ssl'] = false
+
+postgresql['enable'] = false
+
+gitlab_rails['db_adapter'] = 'postgresql'
+gitlab_rails['db_encoding'] = 'unicode'
+gitlab_rails['db_host'] = '53.38.239.212'
+gitlab_rails['db_port'] = 5432
+gitlab_rails['db_password'] = 'MAroot'
+
+gitlab_rails['initial_root_password'] = "MArootroot"
+gitlab_rails['initial_root_email'] = "root@gmail.com"
+
+gitlab_rails['time_zone'] = 'Europe/Paris'
+gitlab_rails['omniauth_enabled'] = true
+gitlab_rails['omniauth_allow_single_sign_on'] = ['openid_connect']
+gitlab_rails['omniauth_block_auto_created_users'] = false
+
+gitlab_rails['omniauth_providers'] = [
+  {
+    name: "openid_connect", # do not change this parameter
+    label: "Keycloak", # optional label for login button, defaults to "Openid Connect"
+    args: {
+      name: "openid_connect",
+      scope: ["openid", "profile", "email"],
+      response_type: "code",
+      issuer:  "https://keycloak-maralex.duckdns.org/realms/master",
+      client_auth_method: "query",
+      discovery: true,
+      uid_field: "preferred_username",
+      pkce: true,
+      client_options: {
+        identifier: "gitlab",
+        secret: "id2WAqrp1gRStdl0wV88YO87DfalODU5",
+        redirect_uri: "https://gitlab-maralex.duckdns.org/users/auth/openid_connect/callback"
+      }
+    }
+  }
+]

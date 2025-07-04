@@ -1,0 +1,50 @@
+---
+- name: Installer NFS
+  dnf:
+    name: nfs-utils
+    state: present
+    update_cache: yes
+
+- name: Activer et démarrer le service NFS
+  systemd:
+    name: nfs-server
+    state: started
+    enabled: yes
+
+- name: Créer le dossier repositories
+  file:
+    path: /srv/gitlab-nfs/repositories
+    state: directory
+    owner: rocky
+    group: rocky
+    mode: '0755'
+
+- name: Créer le dossier uploads
+  file:
+    path: /srv/gitlab-nfs/uploads
+    state: directory
+    owner: rocky
+    group: rocky
+    mode: '0755'
+
+- name: Créer le dossier shared
+  file:
+    path: /srv/gitlab-nfs/shared
+    state: directory
+    owner: rocky
+    group: rocky
+    mode: '0755'
+
+- name: Configurer les exports
+  copy:
+    dest: /etc/exports
+    content: |
+      /srv/gitlab-nfs/repositories 152.228.172.167(rw,sync,no_root_squash,no_subtree_check)
+      /srv/gitlab-nfs/repositories 54.36.101.87(rw,sync,no_root_squash,no_subtree_check)
+      /srv/gitlab-nfs/uploads      152.228.172.167(rw,sync,no_root_squash,no_subtree_check)
+      /srv/gitlab-nfs/uploads      54.36.101.87(rw,sync,no_root_squash,no_subtree_check)
+      /srv/gitlab-nfs/shared       152.228.172.167(rw,sync,no_root_squash,no_subtree_check)
+      /srv/gitlab-nfs/shared       54.36.101.87(rw,sync,no_root_squash,no_subtree_check)
+
+- name: Appliquer les exports
+  command: exportfs -ra

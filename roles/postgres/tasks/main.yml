@@ -1,0 +1,92 @@
+    - name: Ajouter le dépôt PostgreSQL 16
+      get_url:
+        url: https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+        dest: /tmp/pgdg-redhat-repo.rpm
+
+    - name: Installer le dépôt PostgreSQL 16
+      dnf:
+        name: /tmp/pgdg-redhat-repo.rpm
+        disable_gpg_check: true
+        state: present
+
+    - name: Désactiver le module PostgreSQL natif de Rocky
+      command: dnf -qy module disable postgresql
+
+    - name: Installer PostgreSQL 16 et serveur
+      dnf:
+        name:
+          - postgresql16
+          - postgresql16-server
+          - postgresql16-contrib
+        state: present
+
+    - name: Installer pip pour Python 3
+      dnf:
+        name: python3-pip
+        state: present
+
+    - name: Installer les paquets Python requis
+      pip:
+        name: psycopg2-binary
+        state: present
+
+    - name: Vérifier si PostgreSQL est déjà initialisé
+      ansible.builtin.stat:
+        path: "/var/lib/pgsql/16/data/pg_hba.conf"
+      register: postgres_data
+
+    - name: Initialiser PostgreSQL si nécessaire
+      command: /usr/pgsql-16/bin/postgresql-16-setup initdb
+      when: not postgres_data.stat.exists
+
+    - name: Activer et démarrer PostgreSQL
+      service:
+        name: postgresql-16
+        state: started
+        enabled: yes
+
+    - name: Activer l'extension btree_gist dans la base postgres
+      postgresql_ext:
+        name: btree_gist
+        db: postgres
+        state: present
+      become_user: postgres
+
+    - name: Créer l'utilisateur gitlab avec mot de passe
+      postgresql_user:
+        name: gitlab
+        password: "MAroot"
+        login_user: postgres
+        state: present
+      become: yes
+      become_user: postgres
+
+    - name: Créer la base gitlabhq_production avec propriétaire gitlab
+      postgresql_db:
+        name: gitlabhq_production
+        owner: gitlab
+        encoding: UTF8
+        login_user: postgres
+        state: present
+      become: yes
+      become_user: postgres
+    
+    - name: Autoriser les connexions distantes dans postgresql.conf
+      lineinfile:
+        path: /var/lib/pgsql/16/data/postgresql.conf
+        regexp: '^#?listen_addresses\s*='
+        line: "listen_addresses = '*'"
+      become: yes
+
+    - name: Autoriser l'accès md5 pour toutes les IP dans pg_hba.conf
+      lineinfile:
+        path: /var/lib/pgsql/16/data/pg_hba.conf
+        insertafter: '^#.*IPv4 local connections:'
+        line: "host    all             all             0.0.0.0/0               md5"
+      become: yes
+
+    - name: Redémarrer PostgreSQL
+      service:
+        name: postgresql-16
+        state: restarted
+      become: yes

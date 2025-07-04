@@ -1,0 +1,58 @@
+---
+- name: Installer client NFS
+  dnf:
+    name: nfs-utils
+    state: present
+    update_cache: yes
+
+- name: Créer les dossiers de montage
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /mnt/gitlab-nfs/repositories
+    - /mnt/gitlab-nfs/uploads
+    - /mnt/gitlab-nfs/shared
+
+- name: Monter les points NFS maintenant
+  mount:
+    src: "{{ item.src }}"
+    path: "{{ item.path }}"
+    fstype: nfs
+    state: mounted
+  loop:
+    - { src: "51.38.239.212:/srv/gitlab-nfs/repositories", path: "/mnt/gitlab-nfs/repositories" }
+    - { src: "51.38.239.212:/srv/gitlab-nfs/uploads",      path: "/mnt/gitlab-nfs/uploads" }
+    - { src: "51.38.239.212:/srv/gitlab-nfs/shared",       path: "/mnt/gitlab-nfs/shared" }
+
+- name: Ajouter les points dans /etc/fstab
+  mount:
+    src: "{{ item.src }}"
+    path: "{{ item.path }}"
+    fstype: nfs
+    opts: defaults
+    state: present
+  loop:
+    - { src: "51.38.239.212:/srv/gitlab-nfs/repositories", path: "/mnt/gitlab-nfs/repositories" }
+    - { src: "51.38.239.212:/srv/gitlab-nfs/uploads",      path: "/mnt/gitlab-nfs/uploads" }
+    - { src: "51.38.239.212:/srv/gitlab-nfs/shared",       path: "/mnt/gitlab-nfs/shared" }
+
+- name: Modifier gitlab.rb pour storage partagé avec gitaly['configuration']
+  blockinfile:
+    path: /etc/gitlab/gitlab.rb
+    block: |
+      gitaly['configuration'] = {
+        storage: [
+          {
+            name: "default",
+            path: "/mnt/gitlab-nfs/repositories"
+          }
+        ]
+      }
+
+      gitlab_rails['uploads_directory'] = "/mnt/gitlab-nfs/uploads"
+      gitlab_rails['shared_path'] = "/mnt/gitlab-nfs/shared"
+
+- name: Reconfigurer GitLab
+  command: gitlab-ctl reconfigure

@@ -1,0 +1,24 @@
+---
+  - name: Installer EPEL repo (nécessaire pour fail2ban)
+    yum:
+      name: epel-release
+      state: present
+
+  - name: Installer fail2ban
+    yum:
+      name: fail2ban
+      state: present
+
+  - name: Copier la configuration fail2ban depuis le template
+    template:
+      src: jail.local.j2
+      dest: /etc/fail2ban/jail.local
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Démarrer et activer fail2ban
+    systemd:
+      name: fail2ban
+      state: started
+      enabled: yes

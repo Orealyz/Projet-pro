@@ -1,0 +1,31 @@
+---
+  - name: Installer Redis sur Rocky
+    become: true
+    dnf:
+      name: redis
+      state: present
+      update_cache: true
+
+  - name: S'assurer que Redis est démarré et activé
+    become: true
+    systemd:
+      name: redis
+      state: started
+      enabled: yes
+
+  - name: Déployer la configuration de Redis
+    become: true
+    template:
+      src: redis.conf.j2
+      dest: /etc/redis/redis.conf
+      owner: root
+      group: root
+      mode: 0644
+
+
+  - name: Redémarrer Redis (immédiat, sans handler)
+    become: true
+    systemd:
+      name: redis
+      state: restarted
+      enabled: true
