@@ -1,43 +1,5 @@
 ---
 # - name: Initialisation d'une VM
-#   hosts: all
-#   become: true
-#   vars_files:
-#     - roles/init-vm/vars/main.yml
-#   roles:
-#     - init-vm
-
-# - name: Installation de Keycloak
-#   hosts: all
-#   become: true
-#   roles:
-#     - keycloak
-
-# - name: Installation de Nginx
-#   hosts: all
-#   become: true
-#   roles:
-#     - nginx
-
-# - name: Installation de Node Exporter
-#   hosts: all
-#   become: true
-#   roles:
-#     - node-exporter
-
-# - name: Installation de cadvisor
-#   hosts: all
-#   become: true
-#   roles:
-#     - cadvisor
-
-# - name: Installation de Grafana-Prometheus
-#   hosts: all
-#   become: true
-#   roles:
-#     - grafana-prom
-
-# - name: Initialisation d'une VM
 #   hosts: keycloak_nginx
 #   become: true
 #   vars_files:
