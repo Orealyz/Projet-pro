@@ -10,6 +10,7 @@
     path: "{{ item }}"
     state: directory
     mode: '0755'
+    force: yes
   loop:
     - /mnt/gitlab-nfs/repositories
     - /mnt/gitlab-nfs/uploads
