@@ -11,29 +11,18 @@
     state: started
     enabled: yes
 
-- name: Créer le dossier repositories
+- name: Créer les dossiers nécessaires
   file:
-    path: /srv/gitlab-nfs/repositories
+    path: "{{ item }}"
     state: directory
     owner: rocky
     group: rocky
     mode: '0755'
-
-- name: Créer le dossier uploads
-  file:
-    path: /srv/gitlab-nfs/uploads
-    state: directory
-    owner: rocky
-    group: rocky
-    mode: '0755'
-
-- name: Créer le dossier shared
-  file:
-    path: /srv/gitlab-nfs/shared
-    state: directory
-    owner: rocky
-    group: rocky
-    mode: '0755'
+  loop:
+    - /srv/gitlab-nfs/repositories
+    - /srv/gitlab-nfs/uploads
+    - /srv/gitlab-nfs/shared
+    - /srv/gitlab-nfs/builds
 
 - name: Configurer les exports
   copy:
@@ -45,6 +34,8 @@
       /srv/gitlab-nfs/uploads      54.36.101.87(rw,sync,no_root_squash,no_subtree_check)
       /srv/gitlab-nfs/shared       152.228.172.167(rw,sync,no_root_squash,no_subtree_check)
       /srv/gitlab-nfs/shared       54.36.101.87(rw,sync,no_root_squash,no_subtree_check)
+      /srv/gitlab-nfs/builds       152.228.172.167(rw,sync,no_root_squash,no_subtree_check)
+      /srv/gitlab-nfs/builds       54.36.101.87(rw,sync,no_root_squash,no_subtree_check)
 
 - name: Appliquer les exports
   command: exportfs -ra
