@@ -22,7 +22,7 @@
     - /srv/gitlab-nfs/repositories
     - /srv/gitlab-nfs/uploads
     - /srv/gitlab-nfs/shared
-    - /srv/gitlab-nfs/builds
+    - /srv/gitlab-nfs/gitlab-ci/builds
 
 - name: Configurer les exports
   copy:
@@ -34,8 +34,8 @@
       /srv/gitlab-nfs/uploads      54.36.101.87(rw,sync,no_root_squash,no_subtree_check)
       /srv/gitlab-nfs/shared       152.228.172.167(rw,sync,no_root_squash,no_subtree_check)
       /srv/gitlab-nfs/shared       54.36.101.87(rw,sync,no_root_squash,no_subtree_check)
-      /srv/gitlab-nfs/builds       152.228.172.167(rw,sync,no_root_squash,no_subtree_check)
-      /srv/gitlab-nfs/builds       54.36.101.87(rw,sync,no_root_squash,no_subtree_check)
+      /srv/gitlab-nfs/gitlab-ci/builds       152.228.172.167(rw,sync,no_root_squash,no_subtree_check)
+      /srv/gitlab-nfs/gitlab-ci/builds       54.36.101.87(rw,sync,no_root_squash,no_subtree_check)
 
 - name: Appliquer les exports
   command: exportfs -ra

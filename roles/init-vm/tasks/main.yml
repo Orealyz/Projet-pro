@@ -11,3 +11,7 @@
     import_role:
       name: docker
     when: install_docker | default(false)
+
+  - name: Inclure le rôle packages
+    import_role:
+      name: fail2ban

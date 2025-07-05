@@ -3,3 +3,7 @@ domains:
   - gitlab-maralex.duckdns.org
   - grafana-maralex.duckdns.org
   - keycloak-maralex.duckdns.org
+
+backup_file: files/letsencrypt-backup.tar.gz  
+remote_backup_path: /tmp/letsencrypt-backup.tar.gz
+restore_path: /etc/letsencrypt

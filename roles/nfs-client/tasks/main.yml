@@ -26,7 +26,7 @@
     - { src: "51.38.239.212:/srv/gitlab-nfs/repositories", path: "/mnt/gitlab-nfs/repositories" }
     - { src: "51.38.239.212:/srv/gitlab-nfs/uploads",      path: "/mnt/gitlab-nfs/uploads" }
     - { src: "51.38.239.212:/srv/gitlab-nfs/shared",       path: "/mnt/gitlab-nfs/shared" }
-    - { src: "51.38.239.212:/srv/gitlab-nfs/builds",       path: "/mnt/gitlab-nfs/builds" }
+    - { src: "51.38.239.212:/srv/gitlab-nfs/gitlab-ci/builds",       path: "/mnt/gitlab-nfs/gitlab-ci/builds" }
 
 - name: Ajouter les points dans /etc/fstab
   mount:
@@ -39,7 +39,7 @@
     - { src: "51.38.239.212:/srv/gitlab-nfs/repositories", path: "/mnt/gitlab-nfs/repositories" }
     - { src: "51.38.239.212:/srv/gitlab-nfs/uploads",      path: "/mnt/gitlab-nfs/uploads" }
     - { src: "51.38.239.212:/srv/gitlab-nfs/shared",       path: "/mnt/gitlab-nfs/shared" }
-    - { src: "51.38.239.212:/srv/gitlab-nfs/builds",       path: "/mnt/gitlab-nfs/builds" }
+    - { src: "51.38.239.212:/srv/gitlab-nfs/gitlab-ci/builds",       path: "/mnt/gitlab-nfs/gitlab-ci/builds" }
 
 - name: Modifier gitlab.rb pour storage partagé avec gitaly['configuration']
   blockinfile:
@@ -56,7 +56,7 @@
 
       gitlab_rails['uploads_directory'] = "/mnt/gitlab-nfs/uploads"
       gitlab_rails['shared_path'] = "/mnt/gitlab-nfs/shared"
-      gitlab_ci['builds_directory'] = "/mnt/gitlab-nfs/builds"
+      gitlab_ci['builds_directory'] = "/mnt/gitlab-nfs/gitlab-ci/builds"
 
 - name: Reconfigurer GitLab
   command: gitlab-ctl reconfigure

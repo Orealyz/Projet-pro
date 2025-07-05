@@ -1,0 +1,108 @@
+---
+- name: Installer Git si nécessaire
+  package:
+    name: git
+    state: present
+
+- name: Créer un token d'accès personnel GitLab pour root sans forcer la valeur
+  shell: |
+    echo "user = User.find_by_username('root')
+    token = user.personal_access_tokens.create(
+      scopes: [:api],
+      name: 'ansible-token',
+      expires_at: 6.months.from_now,
+      impersonation: false
+    )
+    token.save!
+    puts token.token" | gitlab-rails console
+  run_once: true
+  register: gitlab_token_output
+
+- name: Extraire le token dans une variable
+  set_fact:
+    gitlab_token: "{{ gitlab_token_output.stdout_lines[-2] }}"
+
+
+- name: Debug root_token
+  debug:
+    var: gitlab_token
+
+- name: Créer un projet GitLab via l'API
+  uri:
+    url: "http://127.0.0.1/api/v4/projects"
+    method: POST
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_token }}"
+    body:
+      name: "demo-ansible"
+    status_code: 201 
+    body_format: json
+  run_once: true 
+  register: project_create
+
+
+
+- name: Vérifier si le conteneur gitlab-runner existe
+  delegate_to: localhost
+  become: false  # <== pour éviter que sudo ne soit utilisé
+  docker_container_info:
+    name: gitlab-runner
+  run_once: true 
+  register: runner_info
+  ignore_errors: yes
+
+
+- debug:
+    msg: "Conteneur gitlab-runner existe"
+  when: runner_info.container is defined and runner_info.container is not none
+
+- name: Supprimer un éventuel conteneur runner existant
+  delegate_to: localhost
+  become: false
+  run_once: true 
+  shell: docker rm -f gitlab-runner || true
+
+- name: Lancer un conteneur runner Docker
+  delegate_to: localhost
+  become: false
+  run_once: true 
+  shell: |
+    docker run -d --name gitlab-runner \
+      -v /srv/gitlab-runner/config:/etc/gitlab-runner \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      gitlab/gitlab-runner:latest
+
+- name: Enregistrer le runner Docker
+  delegate_to: localhost
+  become: false
+  run_once: true 
+  vars:
+    runners_token: "{{ project_create.json.runners_token }}"
+  shell: |
+    sleep 10
+    docker exec gitlab-runner gitlab-runner register \
+      --non-interactive \
+      --url "https://gitlab-maralex.duckdns.org" \
+      --registration-token "tsHa5zJJ6QKVYXNhstyi" \
+      --executor "docker" \
+      --docker-image "alpine:latest" \
+      --description "docker-runner-local" \
+      --tag-list "local,ansible" \
+      --run-untagged="true" \
+      --locked="false"
+
+- name: Cloner et pousser le fichier .gitlab-ci.yml
+  become: true
+  run_once: true
+  shell: |
+    rm -rf {{ repo_name }}
+    git config --global user.email "root@gmail.com"
+    git config --global user.name "root"
+    git clone http://root:{{ gitlab_token }}@localhost/root/{{ repo_name }}.git
+    cd {{ repo_name }}
+    echo -e "stages:\n  - test\n\ntest-job:\n  stage: test\n  script:\n    - echo 'Hello from GitLab CI'" > .gitlab-ci.yml
+    git add .gitlab-ci.yml
+    git commit -m "Add .gitlab-ci.yml"
+    git push origin main
+  args:
+    executable: /bin/bash

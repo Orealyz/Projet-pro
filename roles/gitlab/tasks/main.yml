@@ -14,6 +14,68 @@
     state: started
     enabled: true
 
+- name: Enable and start firewalld
+  systemd:
+    name: firewalld
+    state: started
+    enabled: true
+- name: Ouvrir les ports nécessaires dans firewalld
+  firewalld:
+    port: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: yes
+  loop:
+    - 80/tcp
+    - 443/tcp
+- name: Créer un fichier swap de 4 Go
+  command: fallocate -l 4G /swapfile
+  args:
+    creates: /swapfile
+
+- name: Définir les permissions du fichier swap
+  file:
+    path: /swapfile
+    mode: '0600'
+
+- name: Vérifier si /swapfile est un fichier swap
+  command: file /swapfile
+  register: swapfile_check
+
+- name: Initialiser le fichier en tant que swap
+  command: mkswap /swapfile
+  when: "'swap file' not in swapfile_check.stdout"
+
+- name: Activer le swap immédiatement
+  command: swapon /swapfile
+  register: swapon_result
+  changed_when: "'already' not in swapon_result.stderr"
+  failed_when: "'read swap header failed' in swapon_result.stderr"
+
+- name: Ajouter l'entrée swap dans /etc/fstab pour activation au démarrage
+  mount:
+    name: none
+    src: /swapfile
+    fstype: swap
+    opts: sw
+    state: present
+
+- name: créé le dossier pour les secrets
+  file:
+    path: /etc/gitlab/
+    state: directory
+    owner: root
+    group: root 
+    mode: '0755'
+
+- name: copier secrets
+  template:
+    src: gitlab-secrets.json.j2
+    dest: /etc/gitlab/gitlab-secrets.json
+    owner: root
+    group: root 
+    mode: '0644'
+
 - name: Add GitLab CE repository
   shell: curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.rpm.sh | bash
   args:
@@ -45,19 +107,40 @@
 
       # Set to true if instance is using Redis SSL
       gitlab_rails['redis_ssl'] = false
+      # puma['worker_processes'] = 1
+      # puma['min_threads'] = 1
+      # puma['max_threads'] = 2
 
+      # sidekiq['concurrency'] = 5
+
+      # gitlab_rails['db_pool'] = 5
+
+      prometheus_monitoring['enable'] = false
+      # gitlab_pages['enable'] = false
+      # mattermost['enable'] = false
+
+
+      # nginx['listen_port'] = 80
+      # nginx['listen_https'] = false
+
+
+      # nginx['proxy_set_headers'] = {
+      #   "Host" => "$http_host",
+      #   "X-Real-IP" => "$remote_addr",
+      #   "X-Forwarded-For" => "$proxy_add_x_forwarded_for",
+      #   "X-Forwarded-Proto" => "https"
+      # }
+      nginx['enable'] = true
+      nginx['listen_https'] = false  # Pas de HTTPS ici
       nginx['listen_port'] = 80
-      nginx['listen_https'] = false
 
+      # Pour éviter les redirections en HTTPS invalides
+      nginx['redirect_http_to_https'] = false
 
-      nginx['proxy_set_headers'] = {
-        "Host" => "$http_host",
-        "X-Real-IP" => "$remote_addr",
-        "X-Forwarded-For" => "$proxy_add_x_forwarded_for",
-        "X-Forwarded-Proto" => "https"
-      }
 
       # Disable the bundled Omnibus provided PostgreSQL
+      gitlab_rails['runners_enabled'] = true
+
     
       postgresql['enable'] = false
 
@@ -74,6 +157,9 @@
       gitlab_rails['omniauth_allow_single_sign_on'] = ['openid_connect']
       gitlab_rails['omniauth_block_auto_created_users'] = false
       gitlab_rails['trusted_proxies'] = ['51.38.232.14']
+      gitlab_rails['personal_access_token_enabled'] = true
+      gitlab_rails['personal_access_token_scope_api_enabled'] = true
+
       
       gitlab_rails['omniauth_providers'] = [
         {
@@ -97,15 +183,6 @@
         }
       ]
       
-
-# - name: Déployer la configuration de Redis
-#   become: true
-#   template:
-#     src: gitlab.rb.j2
-#     dest: /etc/gitlab/gitlab.rb
-#     owner: root
-#     group: root
-#     mode: 0644
-
 - name: Reconfigure GitLab
   command: gitlab-ctl reconfigure
+

@@ -25,17 +25,29 @@
     dnf:
       name: certbot
       state: present
+
+  - name: Copier l’archive des certificats sur la VM
+    copy:
+      src: "{{ backup_file }}"
+      dest: "{{ remote_backup_path }}"
+      mode: 0644
+
+  - name: Extraire les certificats dans /etc/letsencrypt
+    ansible.builtin.unarchive:
+      src: "{{ remote_backup_path }}"
+      dest: /
+      remote_src: true
   
-  - name: Obtenir le certificat Let's Encrypt (standalone) pour chaque domaine
-    command: >
-      certbot certonly --standalone
-      --non-interactive
-      --agree-tos
-      --email {{ email }}
-      -d {{ item }}
-    args:
-      creates: "/etc/letsencrypt/live/{{ item }}/fullchain.pem"
-    loop: "{{ domains }}"
+  # - name: Obtenir le certificat Let's Encrypt (standalone) pour chaque domaine
+  #   command: >
+  #     certbot certonly --standalone
+  #     --non-interactive
+  #     --agree-tos
+  #     --email {{ email }}
+  #     -d {{ item }}
+  #   args:
+  #     creates: "/etc/letsencrypt/live/{{ item }}/fullchain.pem"
+  #   loop: "{{ domains }}"
 
   - name: Démarrer et activer Nginx
     service:

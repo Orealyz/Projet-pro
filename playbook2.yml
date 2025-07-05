@@ -1,0 +1,6 @@
+---
+- name: Installation runner
+  hosts: gitlab
+  become: true
+  roles:
+    - runner-ci
