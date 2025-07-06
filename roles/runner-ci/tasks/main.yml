@@ -34,7 +34,7 @@
     headers:
       PRIVATE-TOKEN: "{{ gitlab_token }}"
     body:
-      name: "demo-ansible"
+      name: "{{ repo_name }}"
     status_code: 201 
     body_format: json
   run_once: true 
@@ -83,7 +83,7 @@
     docker exec gitlab-runner gitlab-runner register \
       --non-interactive \
       --url "https://gitlab-maralex.duckdns.org" \
-      --registration-token "tsHa5zJJ6QKVYXNhstyi" \
+      --registration-token "{{ token_registration }}" \
       --executor "docker" \
       --docker-image "alpine:latest" \
       --description "docker-runner-local" \
