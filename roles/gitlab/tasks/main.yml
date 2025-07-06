@@ -19,6 +19,7 @@
     name: firewalld
     state: started
     enabled: true
+
 - name: Ouvrir les ports nécessaires dans firewalld
   firewalld:
     port: "{{ item }}"
@@ -28,6 +29,8 @@
   loop:
     - 80/tcp
     - 443/tcp
+    - 9100/tcp
+
 - name: Créer un fichier swap de 4 Go
   command: fallocate -l 4G /swapfile
   args:
