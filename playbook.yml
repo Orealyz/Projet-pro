@@ -1,62 +1,62 @@
 ---
-- name: Initialisation d'une VM
-  hosts: all
-  become: true
-  vars_files:
-    - roles/init-vm/vars/main.yml
-  roles:
-    - init-vm
+# - name: Initialisation d'une VM
+#   hosts: all
+#   become: true
+#   vars_files:
+#     - roles/init-vm/vars/main.yml
+#   roles:
+#     - init-vm
 
-- name: Installation de Grafana
-  hosts: grafana
-  become: true
-  roles:
-    - grafana-prom
+# - name: Installation de Grafana
+#   hosts: grafana
+#   become: true
+#   roles:
+#     - grafana-prom
 
-- name: Installation de Node Exporter
-  hosts: all
-  become: true
-  roles:
-    - node-exporter
+# - name: Installation de Node Exporter
+#   hosts: all
+#   become: true
+#   roles:
+#     - node-exporter
 
-- name: Installation de cadvisor
-  hosts: grafana:keycloak_nginx
-  become: true
-  roles:
-    - cadvisor
+# - name: Installation de cadvisor
+#   hosts: grafana:keycloak_nginx
+#   become: true
+#   roles:
+#     - cadvisor
 
-- name: Installation de postgres
-  hosts: postgres_redis
-  become: true
-  roles:
-    - postgres
-- name: Installation de redis
-  hosts: postgres_redis
-  become: true
-  roles:
-    - redis
-- name: Installation de gitlab
-  hosts: gitlab
-  become: true
-  roles:
-    - gitlab
-- name: Installation de nfs
-  hosts: nfs
-  become: true
-  roles:
-    - nfs
+# - name: Installation de postgres
+#   hosts: postgres_redis
+#   become: true
+#   roles:
+#     - postgres
+# - name: Installation de redis
+#   hosts: postgres_redis
+#   become: true
+#   roles:
+#     - redis
+# - name: Installation de gitlab
+#   hosts: gitlab
+#   become: true
+#   roles:
+#     - gitlab
+# - name: Installation de nfs
+#   hosts: nfs
+#   become: true
+#   roles:
+#     - nfs
 
-- name: Installation de nfs-client
-  hosts: gitlab
-  become: true
-  roles:
-    - nfs-client
+# - name: Installation de nfs-client
+#   hosts: gitlab
+#   become: true
+#   roles:
+#     - nfs-client
 
 - name: Installation de Keycloak et Nginx
   hosts: keycloak_nginx
   become: true
   roles:
     - keycloak
-    - nginx
+    # - nginx
 
 

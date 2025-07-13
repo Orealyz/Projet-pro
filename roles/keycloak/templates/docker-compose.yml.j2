@@ -22,9 +22,11 @@ services:
       KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
       KC_DB_USERNAME: keycloak
       KC_DB_PASSWORD: keycloak
+      KC_PROXY_HEADERS: forwarded
+      KC_HOSTNAME_URL: https://keycloak-maralex.duckdns.org
+      KC_HOSTNAME_ADMIN_URL: https://keycloak-maralex.duckdns.org
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_PROXY: edge 
     ports:
       - "8080:8080"
     depends_on:

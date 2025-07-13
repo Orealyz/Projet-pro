@@ -28,14 +28,14 @@
   copy:
     dest: /etc/exports
     content: |
-      /srv/gitlab-nfs/repositories 152.228.172.167(rw,sync,no_root_squash,no_subtree_check)
-      /srv/gitlab-nfs/repositories 54.36.101.87(rw,sync,no_root_squash,no_subtree_check)
-      /srv/gitlab-nfs/uploads      152.228.172.167(rw,sync,no_root_squash,no_subtree_check)
-      /srv/gitlab-nfs/uploads      54.36.101.87(rw,sync,no_root_squash,no_subtree_check)
-      /srv/gitlab-nfs/shared       152.228.172.167(rw,sync,no_root_squash,no_subtree_check)
-      /srv/gitlab-nfs/shared       54.36.101.87(rw,sync,no_root_squash,no_subtree_check)
-      /srv/gitlab-nfs/gitlab-ci/builds       152.228.172.167(rw,sync,no_root_squash,no_subtree_check)
-      /srv/gitlab-nfs/gitlab-ci/builds       54.36.101.87(rw,sync,no_root_squash,no_subtree_check)
+      /srv/gitlab-nfs/repositories {{ nfs_ip_client1 }}(rw,sync,no_root_squash,no_subtree_check)
+      /srv/gitlab-nfs/repositories {{ nfs_ip_client2 }}(rw,sync,no_root_squash,no_subtree_check)
+      /srv/gitlab-nfs/uploads      {{ nfs_ip_client1 }}(rw,sync,no_root_squash,no_subtree_check)
+      /srv/gitlab-nfs/uploads      {{ nfs_ip_client2 }}(rw,sync,no_root_squash,no_subtree_check)
+      /srv/gitlab-nfs/shared       {{ nfs_ip_client1 }}(rw,sync,no_root_squash,no_subtree_check)
+      /srv/gitlab-nfs/shared       {{ nfs_ip_client2 }}(rw,sync,no_root_squash,no_subtree_check)
+      /srv/gitlab-nfs/gitlab-ci/builds       {{ nfs_ip_client1 }}(rw,sync,no_root_squash,no_subtree_check)
+      /srv/gitlab-nfs/gitlab-ci/builds       {{ nfs_ip_client2 }}(rw,sync,no_root_squash,no_subtree_check)
 
 - name: Appliquer les exports
   command: exportfs -ra

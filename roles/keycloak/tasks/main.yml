@@ -111,8 +111,8 @@
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": true,
       "publicClient": false,
-      "redirectUris": ["{{ gitlab_url }}/users/auth/openid_connect/callback"],
-      "webOrigins": ["{{ gitlab_url }}"],
-      "baseUrl": "{{ gitlab_url }}",
-      "rootUrl": "{{ gitlab_url }}"
+      "redirectUris": ["{{ grafana_root_url }}/users/auth/openid_connect/callback"],
+      "webOrigins": ["{{ grafana_root_url }}"],
+      "baseUrl": "{{ grafana_root_url }}",
+      "rootUrl": "{{ grafana_root_url }}"
     }' | docker exec -i {{ keycloak_container }} /opt/keycloak/bin/kcadm.sh {{ 'update clients/' + gitlab_client_id_keycloak.stdout if gitlab_client_id_keycloak.stdout else 'create clients' }} -r {{ realm }} -f -

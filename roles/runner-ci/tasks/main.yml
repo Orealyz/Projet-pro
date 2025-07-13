@@ -40,11 +40,9 @@
   run_once: true 
   register: project_create
 
-
-
 - name: Vérifier si le conteneur gitlab-runner existe
   delegate_to: localhost
-  become: false  # <== pour éviter que sudo ne soit utilisé
+  become: false
   docker_container_info:
     name: gitlab-runner
   run_once: true 

@@ -19,26 +19,6 @@ http {
         server 51.38.234.58:3000;
     }
 
-    {# # Serveur GitLab 
-    server {
-        listen 80;
-        server_name gitlab-maralex.duckdns.org;
-        return 301 https://$host$request_uri;
-    }
-    # Serveur Keycloak
-    server {
-        listen 80;
-        server_name keycloak-maralex.duckdns.org;
-        return 301 https://$host$request_uri;
-    }
-    # Serveur Grafana
-    server {
-        listen 80;
-        server_name grafana-maralex.duckdns.org;
-        return 301 https://$host$request_uri;
-    } #}
-
-
     # Serveur Keycloak 
     server {
         listen 443 ssl;
