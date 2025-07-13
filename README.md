@@ -1,5 +1,3 @@
-# Projet-pro
-
 # Déploiement du projet *Projet-pro* avec Ansible
 
 ## Prérequis
@@ -194,4 +192,4 @@ ansible-playbook -i inventory/hosts.yml playbook2.yml -v
 - Sauvegarder :
   - Dashboards (format JSON)
   - Datasources
-  - Utilisateurs (selon le mode de stockage : SQLite, PostgreSQL ou fichiers)
+  - Utilisateurs
